@@ -1,4 +1,27 @@
 **/.idea/
-**/*.csv
+**/.vscode/
 **/.DS_Store
+**/*.csv
 **/output/
+
+# Build artifacts
+**/target/
+**/obj/
+**/bin/
+**/.bsp/
+**/.bloop/
+**/.metals/
+**/.lake/
+**/_build/
+
+# OCaml
+**/*.cmi
+**/*.cmo
+**/*.cmx
+**/*.o
+**/*.annot
+
+# .NET / Dafny
+**/*.dll
+**/*.pdb
+**/*.deps.json
