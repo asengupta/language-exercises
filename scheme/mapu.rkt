@@ -1,6 +1,5 @@
 #lang racket
-
-(define atom (lambda (x) (not (pair? x))))
+(define atom? (lambda (x) (not (pair? x))))
 (define mapu (lambda (lst mapfn)
     (cond
       ((null? lst) '())
