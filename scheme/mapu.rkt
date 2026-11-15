@@ -205,7 +205,7 @@
 ; INTERLUDE: Why does it recurse?
 ; Let's evaluate:
 
-;((sum-of-n-explicit-5 sum-of-n-explicit-5) 1)
+;((sum-of-n-explicit-3 sum-of-n-explicit-3) 1)
 ;Assume that:
 
 ;LADDER = (λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))
@@ -220,7 +220,7 @@
 
 ; We unwrap one level of λ and put `E` wherever `foo` is, to get:
 
-;E = (LADDER (E E))
+;(E E) = (LADDER (E E))
 
 ; STEP 3: To evaluate the above, we need to evaluate `(E E)`. This is the same exact step as STEP 2, so we are now in an infinite recursion.
 ; One fix is to delay the evaluation of (foo foo), by wrapping it in a λ, evaluate it inside, like (foo-recur), and then apply it to `n-1`.
@@ -233,8 +233,8 @@
 (λ (foo) ((λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))(λ(n) ((foo foo) n)))))
 
 ; INTERLUDE: Why does this not recurse infinitely?
-;E = (LADDER (λ() (E E)))
-; The expression `(λ() (E E))` does not get evaluated right then, and thus stays as a lambda.
+;(E E) = (LADDER (λ(n) ((E E) n)))
+; The expression `(λ(n) ((E E) n))` does not get evaluated right then, and thus stays as a lambda.
 ; What is more instructive is to see the trace of what happens mmid-recursion, inside.
 
 ; Let E = sum-of-n-explicit-1-arg-recur, then evaluate ((E E) 2):
@@ -246,74 +246,70 @@
 
 ; Let's call P(2):
 => P(2) = (cond ((zero? 2) 0) (else (+ 2 ( (λ(n) ((E E) n)  ) (sub1 2)))))
-=> P(2) = (+ 2 (( (λ(n) ((E E) n) ) ) 1))
+=> P(2) = (+ 2 ( (λ(n) ((E E) n)  ) 1))
+=> P(2) = (+ 2 ( (E E) 1))
 => P(2) = (+ 2 ( 
-  (λ(n) (cond ((zero? n) 0) (else (+ n ((λ(n) ((E E) n) ) (sub1 n))))))
-                          1))
-
-; This is basically applying 1 to `λ(n)` again, so we can unwrap the inner `λ(n)` and write:
-=> P(2) = (+ 2 (
-  (cond ((zero? n) 0) (else (+ n ((λ(n) ((E E) n)) (sub1 n)))))
-                          ))
-
-=> P(2) = (+ 2 (
-  (cond ((zero? 1) 0) (else (+ 1 ((λ(n) ((E E) n)) (sub1 1)))))
-                          ))
-
-=> P(2) = (+ 2 (
-  (cond ((zero? 1) 0) (else (+ 1 ((λ(n) ((E E) n)) 0))))
-                          ))
-
-=> P(2) = (+ 2 
-  (+ 1 ((λ(n) ((E E) n)) 0))
-          )
-
-=> P(2) = (+ 2 
-  (+ 1 ((λ(n) ((E E) n)) 0))
-          )
-
-=> P(2) = (+ 2 
-  (+ 1 (((E E) 0)))
-          )
-
-
-=> P(2) = (+ 2 
-  (+ 1 ((
             (λ(n) (cond ((zero? n) 0) (else (+ n ( (λ(n) ((E E) n) ) (sub1 n))))))
-              0)))
+                                              1))
+
+=> P(2) = (+ 2
+  (cond ((zero? 1) 0) (else (+ 1 ((λ(n) ((E E) n)) (sub1 1)))))
+                          )
+
+=> P(2) = (+ 2
+  (cond ((zero? 1) 0) (else (+ 1 ((λ(n) ((E E) n)) 0))))
+                          )
+
+=> P(2) = (+ 2 
+  (+ 1 ((λ(n) ((E E) n)) 0))
           )
+
+=> P(2) = (+ 2 
+  (+ 1 ((E E) 0))
+          )
+
 
 => P(2) = (+ 2 
   (+ 1 (
+            (λ(n) (cond ((zero? n) 0) (else (+ n ( (λ(n) ((E E) n) ) (sub1 n))))))
+              0))
+          )
+
+=> P(2) = (+ 2 
+  (+ 1
             (cond ((zero? 0) 0) (else (+ 0 ( (λ(n) ((E E) n) ) (sub1 0)))))
-              ))
+              )
           )
 
 => P(2) = (+ 2 (+ 1 0))
 
-; You can run `((sum-of-n-explicit-4 sum-of-n-explicit-4) 10)` for the above. If we went in, and blindly expanded `sum-of-n-explicit-4`, we get the following:
+; You can run `((sum-of-n-explicit-1-arg-recur sum-of-n-explicit-1-arg-recur) 10)` for the above. If we went in, and blindly expanded `sum-of-n-explicit-1-arg-recur`, we get the following:
 (
  (λ(foo) ((λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))(λ(n) ((foo foo) n))))
   (λ(foo) ((λ (foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))(λ(n) ((foo foo) n))))
 )
 
 ; Let's refactor by pulling out the sum-of-n logic, which is the thing which differs in recursive walks; the recursion itself is always a standard pattern.
-(define logic 
+(define sum-of-n-step-factory
   (λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))
 )
 
 (define sum-of-n-explicit-5
 (
- (λ(foo) (logic (λ(n) ((foo foo) n))))
-  (λ(foo) (logic (λ(n) ((foo foo) n))))
+ (λ(foo) (sum-of-n-step-factory (λ(n) ((foo foo) n))))
+  (λ(foo) (sum-of-n-step-factory (λ(n) ((foo foo) n))))
 )
 )
 
-; `logic` is a hardcoded predicate in `sum-of-n-explicit-5`, we can make this more general by passing an predicate into a factory function. This factory function is the Y Combinator.
-(define y-combinator (λ (pred)
+; `sum-of-n-step-factory` is a hardcoded step function in `sum-of-n-explicit-5`, we can make this more general by passing a (generic) step function into a factory function. This factory function is the Y Combinator. It is called a step function because it returns a function which tells us how to take the next step; this can be either termination or further recursion.
+(define y-combinator (λ (step-fn-factory)
 (
- (λ(foo) (pred (λ(n) ((foo foo) n))))
-  (λ(foo) (pred (λ(n) ((foo foo) n))))
+ (λ(foo) (step-fn-factory (λ(n) ((foo foo) n))))
+  (λ(foo) (step-fn-factory (λ(n) ((foo foo) n))))
 )
 ))
+
+; We can call this like:
+
+((y-combinator sum-of-n-step-factory) 10)
 
