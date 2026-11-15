@@ -1,6 +1,6 @@
 #lang racket
-(define atom? (lambda (x) (not (pair? x))))
-(define mapu (lambda (lst mapfn)
+(define atom? (λ (x) (not (pair? x))))
+(define mapu (λ (lst mapfn)
     (cond
       ((null? lst) '())
       (else (cons (mapfn (car lst)) (mapu(cdr lst) mapfn)))
@@ -8,11 +8,11 @@
     )
 )
 
-(define firsts (lambda (lstOfLst)
-                (mapu lstOfLst ( lambda (lst) (car lst) ))
+(define firsts (λ (lstOfLst)
+                (mapu lstOfLst ( λ (lst) (car lst) ))
                  ))
 
-(define insertR (lambda (inserted rightOf lst)
+(define insertR (λ (inserted rightOf lst)
                   (cond
                   ((null? lst) '())
                   ((eq? rightOf (car lst)) (cons rightOf (cons inserted (cdr lst))))
@@ -20,7 +20,7 @@
                   )
                   ))
 
-(define insertL (lambda (inserted rightOf lst)
+(define insertL (λ (inserted rightOf lst)
                   (cond
                   ((null? lst) '())
                   ((eq? rightOf (car lst)) (cons inserted (cons rightOf (cdr lst))))
@@ -28,7 +28,7 @@
                   )
                   ))
 
-(define subst2 (lambda (new o1 o2 lst)
+(define subst2 (λ (new o1 o2 lst)
                  (cond
                    ((null? lst) '())
                    ((eq? o1 (car lst)) (cons new (cdr lst)))
@@ -37,21 +37,21 @@
                   )
                 ))
 
-(define rember (lambda (a lst)
+(define rember (λ (a lst)
                    (cond
                      ((null? lst) '())
                      ((eq? a (car lst)) (cdr lst))
                      (else (cons (car lst) (rember a (cdr lst))))
                    )))
 
-(define multirember (lambda (a lst)
+(define multirember (λ (a lst)
                    (cond
                      ((null? lst) '())
                      ((eq? a (car lst)) (multirember a (cdr lst)))
                      (else (cons (car lst) (multirember a (cdr lst))))
                    )))
 
-(define multiinsertR (lambda (inserted rightOf lst)
+(define multiinsertR (λ (inserted rightOf lst)
                   (cond
                   ((null? lst) '())
                   ((eq? rightOf (car lst)) (cons rightOf (cons inserted (multiinsertR inserted rightOf (cdr lst)))))
@@ -59,21 +59,21 @@
                   )
                   ))
 
-(define multiinsertL (lambda (inserted rightOf lst)
+(define multiinsertL (λ (inserted rightOf lst)
                   (cond
                   ((null? lst) '())
                   ((eq? rightOf (car lst)) (cons inserted (cons rightOf (multiinsertL inserted rightOf (cdr lst)))))
                   (else (cons (car lst) (multiinsertL inserted rightOf (cdr lst))))
                   )
                   ))
-(define o+ (lambda (lhs rhs)
+(define o+ (λ (lhs rhs)
              (cond
               ((zero? rhs) lhs)
               (else (add1 (o+ lhs (sub1 rhs))))
              )
              ))
 (define reconstruct* 
-  (lambda (structure)
+  (λ (structure)
     (cond
       ((atom? structure) structure)
       (else (cons (reconstruct* (car structure)) (reconstruct* (cdr structure))))
@@ -82,7 +82,7 @@
   )
 
 (define rember* 
-  (lambda (toDelete structure)
+  (λ (toDelete structure)
     (cond
       ((atom? structure) structure)
       ((null? structure) '())
@@ -92,14 +92,14 @@
     )
   )
   
-(define two-in-a-row (lambda (lst)
+(define two-in-a-row (λ (lst)
                      (cond
                       ((null? lst) #f)
                       (else (two-in-b-row (car lst) (cdr lst)))
                       ) 
                       ))
 
-(define two-in-b-row (lambda (preceding lst)
+(define two-in-b-row (λ (preceding lst)
                      (cond
                       ((null? lst) #f)
                       ((eq? preceding (car lst)) #t)
@@ -107,29 +107,29 @@
                       ) 
                       ))
 
-(define sum-of-prefixes (lambda (lst)
+(define sum-of-prefixes (λ (lst)
                             (sop-a '0 lst)
                          ))
 
-(define sop-a (lambda (acc lst)
+(define sop-a (λ (acc lst)
                 (cond
                   ((null? lst) '())
                   (else (cons (+ acc (car lst)) (sop-a (+ acc (car lst)) (cdr lst))))
                   )
                 ))
 
-(define scramble (lambda (lst)
+(define scramble (λ (lst)
                     (scrimble '() lst)
                   ))
 
-(define scrimble (lambda (stack lst)
+(define scrimble (λ (stack lst)
                    (cond
                     ((null? lst) lst)
                     (else (cons (peeku (sub1 (car lst)) (cons (car lst) stack)) (scrimble (cons (car lst) stack) (cdr lst))))
                     )
                   ))
 
-(define peeku (lambda (index stack)
+(define peeku (λ (index stack)
                (cond
                  ((zero? index) (car stack))
                  (else (peeku (sub1 index) (cdr stack)))
@@ -137,32 +137,183 @@
                 ) 
   )
 
-(define lenu (lambda (lst)
+(define lenu (λ (lst)
               (cond
                 ((null? lst) '0)
                 (else (add1 (lenu (cdr lst))))
                ))
   )
 
-(define looking (lambda (a lst)
+(define looking (λ (a lst)
                   (keep-looking a (pick 1 lst) lst)))
 
-(define keep-looking (lambda (a elem lst)
+(define keep-looking (λ (a elem lst)
                         (cond
                           ((number? elem) (keep-looking a (pick elem lst) lst))
                           (else (eq? a elem))
                           )
                        ))
 
-(define pick (lambda (index lst)
+(define pick (λ (index lst)
                (cond
                  ((eq? index 1) (car lst))
                  (else (pick (sub1 index) (cdr lst)))
                  )
                ))
 
-(define shift (lambda (x)
+(define shift (λ (x)
                   (cons (car (car x)) (cons (cons (car (cdr (car x))) (cdr x)) '()))
               )
   )
+
+(define sum-of-n (λ (n)
+                  (cond
+                    ((zero? n) 0)
+                    (else (+ n (sum-of-n (sub1 n))))
+                    )
+                   )
+  )
+
+(define sum-of-n-taking-foo (λ (foo n)
+                  (cond
+                    ((zero? n) 0)
+                    (else (+ n (sum-of-n-taking-foo foo (sub1 n))))
+                    )
+                   )
+  )
+
+(define sum-of-n-taking-foo-no-ref (λ (foo n)
+                  (cond
+                    ((zero? n) 0)
+                    (else (+ n (foo foo (sub1 n))))
+                    )
+                   )
+  )
+
+(define sum-of-n-explicit-1
+(λ (foo n) (cond ((zero? n) 0) (else (+ n (foo foo (sub1 n)))))))
+
+; Let's break up the outer lambda into two separate curried functions.
+(define sum-of-n-explicit-2
+(λ (foo) (λ(n) (cond ((zero? n) 0) (else (+ n ((foo foo) (sub1 n))))))))
+
+; Now we wish to inject `(foo foo)` into the `λ(n)`. This means we "create" `λ(n)` by calling an intervening factory lambda which takes in a `foo-recur` which is bound to a `(foo foo)` passed into the `λ(n)` factory lambda. The factory lambda returns the `λ(n)` function.
+; HOWVEVER, the following line won't work because it recurses forever, owing to eager evaluation of (foo foo)
+(define sum-of-n-explicit-3
+(λ (foo) ((λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))(foo foo))))
+
+; INTERLUDE: Why does it recurse?
+; Let's evaluate:
+
+;((sum-of-n-explicit-5 sum-of-n-explicit-5) 1)
+;Assume that:
+
+;LADDER = (λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))
+
+; so that we can write:
+;E = (λ (foo) (LADDER (foo foo)))
+
+; STEP 1: We will now evaluate:
+;`((E E) 1)`
+; STEP 2: So we need to evaluate `(E E)` first, let's substitute the second `E` which is the parameter to `foo`, so:
+;foo = E
+
+; We unwrap one level of λ and put `E` wherever `foo` is, to get:
+
+;E = (LADDER (E E))
+
+; STEP 3: To evaluate the above, we need to evaluate `(E E)`. This is the same exact step as STEP 2, so we are now in an infinite recursion.
+; One fix is to delay the evaluation of (foo foo), by wrapping it in a λ, evaluate it inside, like (foo-recur), and then apply it to `n-1`.
+; This works, but the sum-of-n logic has to remember to evaluate the λ, then apply it.
+(define sum-of-n-explicit-no-arg-recur
+(λ (foo) ((λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n ((foo-recur) (sub1 n)))))))(lambda() (foo foo)))))
+
+; To make the λ oblivious of worrying about evaluating the lambda and then applying it to 'n-1', ehance the `(foo foo)` lambda to also take in the `n-1` parameter and evaluate it. Now the sum-of-n logic just assumes the recursion lambda is a plain function it can just apply on `n-1`.
+(define sum-of-n-explicit-1-arg-recur
+(λ (foo) ((λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))(λ(n) ((foo foo) n)))))
+
+; INTERLUDE: Why does this not recurse infinitely?
+;E = (LADDER (λ() (E E)))
+; The expression `(λ() (E E))` does not get evaluated right then, and thus stays as a lambda.
+; What is more instructive is to see the trace of what happens mmid-recursion, inside.
+
+; Let E = sum-of-n-explicit-1-arg-recur, then evaluate ((E E) 2):
+
+; Then, substituting putting `E` everywhere `foo` is, we get:
+
+((λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n))))))) (λ(n) ((E E) n) ))
+=> P = (E E) = (λ(n) (cond ((zero? n) 0) (else (+ n ( (λ(n) ((E E) n) ) (sub1 n))))))
+
+; Let's call P(2):
+=> P(2) = (cond ((zero? 2) 0) (else (+ 2 ( (λ(n) ((E E) n)  ) (sub1 2)))))
+=> P(2) = (+ 2 (( (λ(n) ((E E) n) ) ) 1))
+=> P(2) = (+ 2 ( 
+  (λ(n) (cond ((zero? n) 0) (else (+ n ((λ(n) ((E E) n) ) (sub1 n))))))
+                          1))
+
+; This is basically applying 1 to `λ(n)` again, so we can unwrap the inner `λ(n)` and write:
+=> P(2) = (+ 2 (
+  (cond ((zero? n) 0) (else (+ n ((λ(n) ((E E) n)) (sub1 n)))))
+                          ))
+
+=> P(2) = (+ 2 (
+  (cond ((zero? 1) 0) (else (+ 1 ((λ(n) ((E E) n)) (sub1 1)))))
+                          ))
+
+=> P(2) = (+ 2 (
+  (cond ((zero? 1) 0) (else (+ 1 ((λ(n) ((E E) n)) 0))))
+                          ))
+
+=> P(2) = (+ 2 
+  (+ 1 ((λ(n) ((E E) n)) 0))
+          )
+
+=> P(2) = (+ 2 
+  (+ 1 ((λ(n) ((E E) n)) 0))
+          )
+
+=> P(2) = (+ 2 
+  (+ 1 (((E E) 0)))
+          )
+
+
+=> P(2) = (+ 2 
+  (+ 1 ((
+            (λ(n) (cond ((zero? n) 0) (else (+ n ( (λ(n) ((E E) n) ) (sub1 n))))))
+              0)))
+          )
+
+=> P(2) = (+ 2 
+  (+ 1 (
+            (cond ((zero? 0) 0) (else (+ 0 ( (λ(n) ((E E) n) ) (sub1 0)))))
+              ))
+          )
+
+=> P(2) = (+ 2 (+ 1 0))
+
+; You can run `((sum-of-n-explicit-4 sum-of-n-explicit-4) 10)` for the above. If we went in, and blindly expanded `sum-of-n-explicit-4`, we get the following:
+(
+ (λ(foo) ((λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))(λ(n) ((foo foo) n))))
+  (λ(foo) ((λ (foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))(λ(n) ((foo foo) n))))
+)
+
+; Let's refactor by pulling out the sum-of-n logic, which is the thing which differs in recursive walks; the recursion itself is always a standard pattern.
+(define logic 
+  (λ(foo-recur) (λ(n) (cond ((zero? n) 0) (else (+ n (foo-recur (sub1 n)))))))
+)
+
+(define sum-of-n-explicit-5
+(
+ (λ(foo) (logic (λ(n) ((foo foo) n))))
+  (λ(foo) (logic (λ(n) ((foo foo) n))))
+)
+)
+
+; `logic` is a hardcoded predicate in `sum-of-n-explicit-5`, we can make this more general by passing an predicate into a factory function. This factory function is the Y Combinator.
+(define y-combinator (λ (pred)
+(
+ (λ(foo) (pred (λ(n) ((foo foo) n))))
+  (λ(foo) (pred (λ(n) ((foo foo) n))))
+)
+))
 
