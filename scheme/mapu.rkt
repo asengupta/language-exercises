@@ -357,4 +357,72 @@
                      )
                      ))
 
+(define union (λ(l1 l2)
+                (cond
+                  ((null? l1) l2)
+                  ((not (member? (car l1) l2)) (cons (car l1) (union (cdr l1) l2)))
+                  (else (union (cdr l1) l2))
+                  )
+                ))
 
+(define intersect-all (λ(ls)
+                        (cond
+                          ((null? ls) '())
+                          ((null? (cdr ls)) (car ls))
+                          (else (intersect (car ls) (intersect-all (cdr ls))))
+                          )
+                        )
+)
+
+(define sum-recursion (λ(lhs rhs)
+              (cond
+                ((zero? lhs) rhs)
+                (else (add1 (sum-recursion (sub1 lhs) rhs)))
+                )
+              ))
+
+(define sum-acc (λ(lhs rhs)
+              (cond
+                ((zero? lhs) rhs)
+                (else (sum-acc (sub1 lhs) (add1 rhs)))
+                )
+              ))
+
+(define a-pair? (λ(l)
+                  (cond
+                    ((or (null? l) (null? (cdr l))) #f)
+                    (else (null? (cdr (cdr l))))
+                  )
+                  ))
+
+(define first (λ(p)
+                (car p)
+                ))
+
+
+(define second (λ(p)
+                (car (cdr p))
+                ))
+
+(define build (λ(lhs rhs)
+                (cons lhs (cons rhs '()))
+                ))
+
+(define fun? (λ(rel)
+            (set? (firsts rel))
+            ))
+
+(define flip (λ(p)
+              (build (second p) (first p))
+              ))
+
+(define revrel (λ(rel)
+                 (cond
+                   ((null? rel) '())
+                   (else (cons (flip (car rel)) (revrel (cdr rel))))
+                   )
+                 ))
+
+(define fullfun? (λ(rel)
+                   (fun? (revrel rel))
+                   ))
