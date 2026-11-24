@@ -298,3 +298,63 @@
                )
              ))
 
+(define member? (λ(a l)
+                  (cond
+                    ((null? l) #f)
+                    ((eq? a (car l)) #t)
+                    (else (member? a (cdr l)))
+                    )
+                  ))
+
+(define set? (λ(l)
+               (cond
+                 ((null? l) #t)
+                 (else (and (not (member? (car l) (cdr l))) (set? (cdr l)) ))
+                 )
+               ))
+
+(define makeset (λ(l)
+                  (cond
+                    ((null? l) '())
+                    ((member? (car l) (cdr l)) (makeset (cdr l)))
+                    (else (cons (car l) (makeset (cdr l))))
+                    )
+                  ))
+
+(define makeset-multirember (λ(l)
+                  (cond
+                    ((null? l) '())
+                    (else (cons (car l) (makeset-multirember (multirember (car l) (cdr l)))))
+                  ))
+)
+
+(define my-subset? (λ(l1 l2)
+                  (cond
+                    ((null? l1) #t)
+                    (else (and (member? (car l1) l2) (my-subset? (cdr l1) l2)))
+                    )
+                  ))
+
+(define eqset? (λ(l1 l2)
+                 (and (my-subset? l1 l2) (my-subset? l2 l1))
+                 ))
+
+(define intersect? (λ(l1 l2)
+                     (cond
+                      ((null? l1) #f)
+;;                      ((member? (car l1) l2) #t)
+;;                      (else (intersect? (cdr l1) l2))
+                      (else (or (member? (car l1) l2) (intersect? (cdr l1) l2)))
+                     )
+                     ))
+
+
+(define intersect (λ(l1 l2)
+                     (cond
+                      ((null? l1) '())
+                      ((member? (car l1) l2) (cons (car l1) (intersect (cdr l1) l2)))
+                      (else (intersect (cdr l1) l2))
+                     )
+                     ))
+
+
